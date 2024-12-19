@@ -15,6 +15,10 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.254
           aliases:
             - unbound
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     mysql-mailcow:
       image: mariadb:10.5
@@ -40,7 +44,11 @@ services:
         mailcow-network:
           aliases:
             - mysql
-
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
+        
     redis-mailcow:
       image: redis:7-alpine
       volumes:
@@ -59,7 +67,11 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
           aliases:
             - redis
-
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
+        
     clamd-mailcow:
       image: mailcow/clamd:1.66
       restart: always
@@ -78,7 +90,11 @@ services:
         mailcow-network:
           aliases:
             - clamd
-
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
+        
     rspamd-mailcow:
       image: mailcow/rspamd:1.98
       stop_grace_period: 30s
@@ -110,6 +126,10 @@ services:
         mailcow-network:
           aliases:
             - rspamd
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     php-fpm-mailcow:
       image: mailcow/phpfpm:1.91.1
@@ -175,6 +195,10 @@ services:
         mailcow-network:
           aliases:
             - phpfpm
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     sogo-mailcow:
       image: mailcow/sogo:1.127.1
@@ -216,13 +240,19 @@ services:
         ofelia.job-exec.sogo_eautoreply.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-tool update-autoreply -p /etc/sogo/cron.creds || exit 0\""
         ofelia.job-exec.sogo_backup.schedule: "@every 24h"
         ofelia.job-exec.sogo_backup.command: "/bin/bash -c \"[[ $${MASTER} == y ]] && /usr/local/bin/gosu sogo /usr/sbin/sogo-tool backup /sogo_backup ALL || exit 0\""
+        coolify.managed: true
+        coolify.applicationId: ${APPLICATION_ID}
+        coolify.type: application
+        traefik.enable: true
+        traefik.http.routers.mailcow${APPLICATION_ID}.rule: "Host(`${MAILCOW_HOSTNAME}`) && PathPrefix(`/`)"
+        traefik.http.routers.mailcow${APPLICATION_ID}.entryPoints: http
       restart: always
       networks:
         mailcow-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
           aliases:
             - sogo
-
+  
     dovecot-mailcow:
       image: mailcow/dovecot:2.2
       depends_on:
@@ -296,6 +326,9 @@ services:
         ofelia.job-exec.dovecot_fts.command: "/bin/bash -c \"/usr/local/bin/gosu vmail /usr/local/bin/optimize-fts.sh\""
         ofelia.job-exec.dovecot_repl_health.schedule: "@every 5m"
         ofelia.job-exec.dovecot_repl_health.command: "/bin/bash -c \"/usr/local/bin/gosu vmail /usr/local/bin/repl_health.sh\""
+        coolify.managed: true
+        coolify.applicationId: ${APPLICATION_ID}
+        coolify.type: application
       ulimits:
         nproc: 65535
         nofile:
@@ -346,6 +379,10 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.253
           aliases:
             - postfix
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     memcached-mailcow:
       image: memcached:alpine
@@ -356,6 +393,10 @@ services:
         mailcow-network:
           aliases:
             - memcached
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     nginx-mailcow:
       depends_on:
@@ -401,6 +442,10 @@ services:
         mailcow-network:
           aliases:
             - nginx
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     acme-mailcow:
       depends_on:
@@ -443,6 +488,10 @@ services:
         mailcow-network:
           aliases:
             - acme
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     netfilter-mailcow:
       image: mailcow/netfilter:1.59
@@ -462,6 +511,10 @@ services:
       network_mode: "host"
       volumes:
         - /lib/modules:/lib/modules:ro
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     watchdog-mailcow:
       image: mailcow/watchdog:2.05
@@ -533,6 +586,10 @@ services:
         mailcow-network:
           aliases:
             - watchdog
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     dockerapi-mailcow:
       image: mailcow/dockerapi:2.09
@@ -552,7 +609,10 @@ services:
         mailcow-network:
           aliases:
             - dockerapi
-
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     ##### Will be removed soon #####
     solr-mailcow:
@@ -573,6 +633,10 @@ services:
         mailcow-network:
           aliases:
             - solr
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
     ################################
 
     olefy-mailcow:
@@ -592,6 +656,10 @@ services:
         mailcow-network:
           aliases:
             - olefy
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
     ofelia-mailcow:
       image: mcuadros/ofelia:latest
@@ -605,6 +673,9 @@ services:
         - dovecot-mailcow
       labels:
         ofelia.enabled: "true"
+        coolify.managed: true
+        coolify.applicationId: ${APPLICATION_ID}
+        coolify.type: application
       security_opt:
         - label=disable
       volumes:
@@ -643,6 +714,10 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - /lib/modules:/lib/modules:ro
+      labels:
+        - coolify.managed=true
+        - coolify.applicationId=${APPLICATION_ID}
+        - coolify.type=application
 
 networks:
   mailcow-network:
