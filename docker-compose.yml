@@ -243,9 +243,7 @@ services:
         coolify.managed: true
         coolify.applicationId: ${APPLICATION_ID}
         coolify.type: application
-        traefik.enable: true
-        traefik.http.routers.mailcow${APPLICATION_ID}.rule: "Host(`${MAILCOW_HOSTNAME}`) && PathPrefix(`/`)"
-        traefik.http.routers.mailcow${APPLICATION_ID}.entryPoints: http
+        
       restart: always
       networks:
         mailcow-network:
@@ -446,6 +444,9 @@ services:
         - coolify.managed=true
         - coolify.applicationId=${APPLICATION_ID}
         - coolify.type=application
+        - traefik.enable=true
+        - "traefik.http.routers.mailcow${APPLICATION_ID}.rule=Host(`${MAILCOW_HOSTNAME}`) && PathPrefix(`/`)"
+        - traefik.http.routers.mailcow${APPLICATION_ID}.entryPoints=http
 
     acme-mailcow:
       depends_on:
